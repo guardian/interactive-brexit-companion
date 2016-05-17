@@ -8,6 +8,18 @@ module.exports = function(grunt) {
 
         visuals: { },
 
+        postcss: {
+            options: {
+                processors: [
+                    require('autoprefixer')({browsers: ['> 5%', 'last 2 versions', 'IE 9', 'Safari 6']}),
+                    require('cssnano')()
+                ]
+            },
+            dist: {
+                src: 'build/*.css'
+            }
+        },
+
         watch: {
             js: {
                 files: ['src/js/**/*'],
@@ -227,7 +239,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('embed', ['shell:embed', 'template:embed', 'sass:embed']);
     grunt.registerTask('interactive', ['shell:interactive', 'template:bootjs', 'sass:interactive']);
-    grunt.registerTask('all', ['interactive', 'embed', 'copy:assets'])
+    grunt.registerTask('all', ['interactive', 'embed', 'postcss', 'copy:assets']);
     grunt.registerTask('default', ['clean', 'copy:harness', 'all', 'connect', 'watch']);
     grunt.registerTask('build', ['clean', 'all']);
     grunt.registerTask('deploy', ['loadDeployConfig', 'prompt:visuals', 'build', 'copy:deploy', 'aws_s3', 'boot_url']);
