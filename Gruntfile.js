@@ -114,6 +114,11 @@ module.exports = function(grunt) {
                         src: ['boot.js', 'embed.html'],
                         dest: 'deploy/<%= visuals.timestamp %>'
                     },
+										{ // curl
+												expand:true, cwd: 'jspm_packages/github/cujojs/curl@0.8.13/dist/curl/',
+												src: 'curl.js',
+												dest: 'deploy/<%= visuals.timestamp %>/<%= visuals.timestamp %>'
+										},
                     { // ASSETS
                         expand: true, cwd: 'build/',
                         src: ['main.js', 'main.css', 'main.js.map', 'main.css.map',
