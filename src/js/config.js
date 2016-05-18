@@ -13,6 +13,7 @@ System.config({
   },
 
   map: {
+    "curl": "github:cujojs/curl@0.8.13",
     "guardian/iframe-messenger": "github:guardian/iframe-messenger@master",
     "json": "github:systemjs/plugin-json@0.1.0",
     "olado/doT": "github:olado/doT@1.0.1",

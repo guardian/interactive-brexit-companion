@@ -2,11 +2,36 @@ import iframeMessenger from 'guardian/iframe-messenger'
 import reqwest from 'reqwest'
 import thankYouHTML from './text/thankYou.html!text'
 
-// import reasonsTemplate from './text/reasons.dot.html!text'
 import questionAndAnswer from './text/questionAndAnswer.dot.html!text'
 import expandableQuestionAndAnswer from './text/expandableQuestionAndAnswer.dot.html!text'
 
 import dot from 'olado/doT'
+
+
+var isVisible;
+var visibilityEventName = 'interactiveVisibilityChange';
+var ophanUrl = '//j.ophan.co.uk/interactive.js';
+
+var formats = {
+    flat: {
+        preprocess: (data) => data,
+        template: questionAndAnswer
+    },
+    expandable: {
+        preprocess: (data) => {
+            // TODO: don't modify data in place!
+            let words = data.Answer.split(' ');
+            data.mainAnswer = words.slice(0, 65).join(' ');
+            data.extraAnswer = words.slice(65).join(' ');
+            return data;
+        },
+        template: expandableQuestionAndAnswer
+    },
+    carousel: {
+        preprocess: (data) => data,
+        template: ''
+    }
+}
 
 if (!('remove' in Element.prototype)) {
     Element.prototype.remove = function() {
@@ -55,42 +80,31 @@ function setupVisibilityMonitoring() {
         }
 
         if (_hasVisibilityChanged()) {
-            if (isVisible) {
-                console.log('%c VISIBLE', 'background: #222; color: #bada55');
-            } else {
-                console.log('%c NOT VISIBLE', 'background: #222; color: #bada55');
-            }
+            document.dispatchEvent(visibilityEventName);
         }
     });    
 }
 
-var formats = {
-    flat: {
-        preprocess: (data) => data,
-        template: questionAndAnswer
-    },
-    expandable: {
-        preprocess: (data) => {
-            // TODO: don't modify data in place!
-            let words = data.Answer.split(' ');
-            data.mainAnswer = words.slice(0, 65).join(' ');
-            data.extraAnswer = words.slice(65).join(' ');
-            return data;
-        },
-        template: expandableQuestionAndAnswer
-    },
-    carousel: {
-        preprocess: (data) => data,
-        template: ''
-    }
+function loadOphan() {
+    var event = document.createEvent('Event');
+
+    event.initEvent(visibilityEventName, true, true);
+
+    curl([ophanUrl]).then(function(ophan) {
+        ophan.initAttention({
+            changeEvent: visibilityEventName,
+            state: function() {
+                return isVisible;
+            }
+        });
+    });
 }
 
 window.init = function init(el, config) {
-    var isVisible;
-
     iframeMessenger.enableAutoResize();
 
     setupVisibilityMonitoring();
+    loadOphan();
 
     var query = window.location.search.replace('?', '').split('&');
     var params = {};
