@@ -10,6 +10,7 @@ import dot from 'olado/doT'
 
 var isVisible;
 var visibilityEventName = 'interactiveVisibilityChange';
+var visibilityEvent;
 var ophanUrl = '//j.ophan.co.uk/interactive.js';
 
 var formats = {
@@ -80,21 +81,20 @@ function setupVisibilityMonitoring() {
         }
 
         if (_hasVisibilityChanged()) {
-            document.dispatchEvent(visibilityEventName);
+            document.dispatchEvent(visibilityEvent);
         }
     });    
 }
 
 function loadOphan() {
-    var event = document.createEvent('Event');
-
-    event.initEvent(visibilityEventName, true, true);
+    visibilityEvent = document.createEvent('Event');
+    visibilityEvent.initEvent(visibilityEventName, true, true);
 
     curl([ophanUrl]).then(function(ophan) {
         ophan.initAttention({
             changeEvent: visibilityEventName,
             state: function() {
-                return isVisible;
+                return isVisible ? 'visible' : 'invisible';
             }
         });
     });
@@ -103,8 +103,8 @@ function loadOphan() {
 window.init = function init(el, config) {
     iframeMessenger.enableAutoResize();
 
-    setupVisibilityMonitoring();
     loadOphan();
+    setupVisibilityMonitoring();
 
     var query = window.location.search.replace('?', '').split('&');
     var params = {};
