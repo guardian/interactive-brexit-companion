@@ -3,14 +3,29 @@ import q from '../lib/query';
 import slider from './helpers/slider';
 
 export default {
-    preprocess(data) {
-        return data;
+    preprocess({
+        headline1: question,
+        headline2: answer_1_title,
+        content2: answer_1_body,
+        headline3: answer_2_title,
+        content3: answer_2_body,
+    }) {
+        return {
+            question,
+            answer_1_title,
+            answer_1_body,
+            answer_2_title,
+            answer_2_body,
+        };
     },
-    postRender(data) {
+    postRender() {
         function goToAnswer(answer) {
-            q(`.js-back-to-question[data-answer="${answer}"]`).forEach(el => el.classList.remove('u-hidden'));
-            q('.js-go-to-answer').forEach(el => el.classList.add('u-hidden'));
-
+            q(`.js-back-to-question[data-answer="${answer}"]`).forEach(el => {
+                el.classList.remove('u-hidden');
+            });
+            q('.js-go-to-answer').forEach(el => {
+                el.classList.add('u-hidden');
+            });
             if (answer === 'one') {
                 slider.slideLeft();
             } else {
@@ -20,22 +35,16 @@ export default {
 
         function backToQuestion() {
             slider.reset();
-
             q('.js-back-to-question').forEach(el => el.classList.add('u-hidden'));
-
             q('.js-go-to-answer').forEach(el => el.classList.remove('u-hidden'));
         }
 
         q('.js-go-to-answer').forEach(el => {
-            el.addEventListener('click', ev => goToAnswer(el.getAttribute('data-answer')));
+            el.addEventListener('click', () => goToAnswer(el.getAttribute('data-answer')));
         });
-
         q('.js-back-to-question').forEach(el => {
-            el.addEventListener('click', ev => backToQuestion());
+            el.addEventListener('click', () => backToQuestion());
         });
     },
     template: twoSidedTemplate,
-
-    url: 'https://interactive.guim.co.uk/docsdata/1SYM89nttwfXXMHJu-ACBbZxo03Vh5zGGDp7kpc8JX2Q.json',
-
 };

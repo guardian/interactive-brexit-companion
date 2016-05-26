@@ -10,16 +10,16 @@ export default {
         const max = 5;
         let i = 1;
         let bigNumber;
-        let answer;
+        let content;
 
         for (; i <= max; i += 1) {
-            bigNumber = data[`number_${i}`];
-            answer = data[`fact_${i}`];
-            if (answer && bigNumber) {
+            bigNumber = data[`headline${i}`];
+            content = data[`content${i}`];
+            if (content && bigNumber) {
                 bigNumber = bigNumber.replace(
                     bigNumberMatcher, '<span class="big-number">$1</span>'
                 );
-                slides.push({ bigNumber, answer });
+                slides.push({ bigNumber, content });
             }
         }
         newData.slides = slides;
@@ -32,5 +32,4 @@ export default {
         buildCarousel(slideCount);
     },
     template: carouselTemplate,
-    url: 'https://interactive.guim.co.uk/docsdata/1h7mnJsLETpkgNe2UJC35ChJzrHVi7INjLpH5sEAYcqQ.json',
 };

@@ -9,5 +9,5 @@ export default {
     expandable,
     number_carousel: bigNumberCarousel,
     text_carousel: textCarousel,
-    two_sided: twoSided
+    two_sided: twoSided,
 };
