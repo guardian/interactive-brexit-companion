@@ -2,23 +2,23 @@ import q from '../lib/query';
 import expandableTemplate from '../text/expandable.dot.html!text';
 
 export default {
-    preprocess(data) {
-        // TODO: don't modify data in place!
-        const words = data.Answer.split(' ');
+    preprocess({ content1: content, headline1: header }) {
+        const words = content.split(' ');
+        const mainContentLength = 65;
+        const mainContent = words.slice(0, mainContentLength).join(' ');
+        const extraContent = words.slice(mainContentLength).join(' ');
 
-        data.mainAnswer = words.slice(0, 65).join(' ');
-        data.extraAnswer = words.slice(65).join(' ');
-
-        return data;
+        return { header, mainContent, extraContent };
     },
     postRender() {
         q('.js-expand').forEach(el => el.addEventListener('click', ev => {
             const readMoreLink = ev.currentTarget;
 
-            q('.js-extra-content').forEach(extraContentElement => extraContentElement.classList.remove('u-hidden'));
+            q('.js-extra-content').forEach(extraContentElement => {
+                extraContentElement.classList.remove('u-hidden');
+            });
             readMoreLink.remove();
         }));
     },
     template: expandableTemplate,
-    url: 'https://interactive.guim.co.uk/docsdata/1zsqQf4mq8fsAkZAXnoSCNpap2hykFDA3Cm3HaI9qe8k.json',
 };

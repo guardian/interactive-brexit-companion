@@ -1,9 +1,10 @@
 import iframeMessenger from 'guardian/iframe-messenger';
-import reqwest from 'reqwest';
 import dot from 'olado/doT';
 import formats from './formats/index';
 import feedback from './text/feedback.dot.partial.html!text';
 import render from './render';
+import requests from './requests';
+import parallel from 'async.parallel';
 
 if (!('remove' in Element.prototype)) {
     Element.prototype.remove = function remove() {
@@ -60,37 +61,71 @@ function getQueryParams() {
 }
 
 window.init = function init(parentEl) {
+    const untailoredRequest = callback => callback(null, {});
     const params = getQueryParams();
-    const { sheet, id, format = 'flat' } = params;
-
-    if (!formats[format]) {
-        throw new Error(`format ${format} is not valid`);
-    }
-    const { template, postRender, preprocess, url } = formats[format];
+    const isTailored = Boolean(params.tailored);
 
     iframeMessenger.enableAutoResize();
     setupVisibilityMonitoring();
-    reqwest({
-        url,
-        type: 'json',
-        crossOrigin: false,
-        success: (res) => {
-            const templateFn = dot.template(template, null, { feedback });
-            const rows = res && res.sheets && res.sheets[sheet];
-            const trackingCode = `brexit__${sheet}__${id}`;
-            let row;
+    parallel(
+        [
+            requests.spreadsheetRequest,
+            params.tailored ? requests.tailorRequest : untailoredRequest,
+        ],
+        (err, [spreadsheetRes, tailorRes]) => {
+            if (err) {
+                throw err;
+            }
+
+            function getRowById(rows, rowId) {
+                return rows.reduce((prev, row) => {
+                    if (row.id === rowId) {
+                        return row;
+                    }
+
+                    return prev;
+                }, null);
+            }
+
+            function getTailoringLevel() {
+                if (!isTailored) {
+                    return 'untailored';
+                }
+
+                return tailorRes.level || params.default;
+            }
+
+            function getRowId(level) {
+                if (!isTailored) {
+                    return params.id;
+                }
+
+                return params[level];
+            }
+
+            const rows = spreadsheetRes.sheets.content;
 
             if (!rows || !rows.length) {
-                throw new Error(`bad JSON response: ${JSON.stringify(res)}`);
+                throw new Error(`bad JSON response: ${JSON.stringify(spreadsheetRes)}`);
             }
-            rows.forEach((r) => {
-                if (r.id === id) {
-                    row = r;
-                }
-            });
+
+            const level = getTailoringLevel();
+            const id = getRowId(level);
+            const row = getRowById(rows, id);
+
             if (!row) {
                 throw new Error(`row with id ${id} not found`);
             }
+
+            const format = formats[row.format];
+
+            if (!format) {
+                throw new Error(`format ${row.format} is not valid`);
+            }
+
+            const { template, postRender, preprocess } = format;
+            const templateFn = dot.template(template, null, { feedback });
+            const trackingCode = `brexit__${level}__${id}`;
             const rowData = preprocess(row);
             const templateData = {
                 data: rowData,
@@ -101,6 +136,6 @@ window.init = function init(parentEl) {
             };
             render(templateFn, templateData, parentEl);
             postRender(rowData);
-        },
-    });
+        }
+    );
 };
