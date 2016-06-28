@@ -203,21 +203,21 @@ module.exports = function(grunt) {
                 files: [
                     { // ASSETS
                         expand: true,
-                        cwd: 'deploy/<%= visuals.timestamp %>',
+                        cwd: 'deploy/packages/interactive-brexit-companion',
                         src: ['<%= visuals.timestamp %>/**/*'],
                         dest: '<%= visuals.s3.path %>',
                         params: { CacheControl: 'max-age=2678400' }
                     },
                     { // BOOT
                         expand: true,
-                        cwd: 'deploy/<%= visuals.timestamp %>',
+                        cwd: 'deploy/packages/interactive-brexit-companion',
                         src: ['boot.js'],
                         dest: '<%= visuals.s3.path %>',
                         params: { CacheControl: 'max-age=60' }
                     },
                     { // EMBED
                         expand: true,
-                        cwd: 'deploy/<%= visuals.timestamp %>/embed',
+                        cwd: 'deploy/packages/interactive-brexit-companion/embed',
                         src: ['embed.html'],
                         dest: '<%= visuals.s3.path %>/embed',
                         params: { CacheControl: 'max-age=60' }
