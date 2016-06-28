@@ -1,4 +1,5 @@
-import thankYouHTML from './text/thankYou.html!text';
+import surveyHTML from './text/survey.html!text';
+import supporterHTML from './text/supporter.html!text';
 import q from './lib/query';
 
 function bindEventHandlers(atomId) {
@@ -7,7 +8,11 @@ function bindEventHandlers(atomId) {
         const feedback = feedbackButton.closest('.js-feedback-container');
         const surveyHref = feedbackButton.getAttribute('data-survey-href');
 
-        feedback.innerHTML = thankYouHTML.replace(/%surveyHref%/g, surveyHref).replace(/%atomId%/g, atomId);
+        if (el.classList.contains('explainer__button--dislike')) {
+            feedback.innerHTML = surveyHTML.replace(/%surveyHref%/g, surveyHref);
+        } else {
+            feedback.innerHTML = supporterHTML.replace(/%atomId%/g, atomId);
+        }
     }));
 }
 
