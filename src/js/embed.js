@@ -80,7 +80,7 @@ function doRender(row, trackingCode, parentEl) {
     const rowData = preprocess(row);
     const templateData = buildTemplateData(rowData, trackingCode);
 
-    render(templateFn, templateData, parentEl);
+    render(templateFn, templateData, parentEl, row.id);
     postRender(rowData);
 }
 
