@@ -49,6 +49,7 @@ function buildTemplateData(rowData, trackingCode) {
             goTo: `${trackingCode}__go_to`,
             back: `${trackingCode}__back`,
             catchMeUp: `${trackingCode}__catch_me_up`,
+            signup: `${trackingCode}__signup`,
         },
     };
 }
