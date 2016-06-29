@@ -49,6 +49,7 @@ function buildTemplateData(rowData, trackingCode) {
             goTo: `${trackingCode}__go_to`,
             back: `${trackingCode}__back`,
             catchMeUp: `${trackingCode}__catch_me_up`,
+            signup: `${trackingCode}__signup`,
         },
     };
 }
@@ -80,7 +81,7 @@ function doRender(row, trackingCode, parentEl) {
     const rowData = preprocess(row);
     const templateData = buildTemplateData(rowData, trackingCode);
 
-    render(templateFn, templateData, parentEl);
+    render(templateFn, templateData, parentEl, row.id);
     postRender(rowData);
 }
 
