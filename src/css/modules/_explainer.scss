@@ -4,25 +4,6 @@
     background-color: colour(news-main-1);
     color: #ffffff;
     position: relative;
-
-    &:before, &:after {
-        content: '';
-        display: block;
-        position: absolute;
-        left: 0;
-        width: 100%;
-        height: $shadow-height;
-    }
-
-    &:before {
-        background: url('<svg xmlns="http://www.w3.org/2000/svg" width="250" height="18" viewBox="0 0 250 18"><path fill="#4BC6DF" d="M230 18l-1.6-18L22.7 18"/></svg>') no-repeat right;
-        top: -$shadow-height;
-    }
-
-    &:after {
-        background: url('<svg xmlns="http://www.w3.org/2000/svg" width="250" height="18" viewBox="0 0 250 18"><path fill="#4BC6DF" d="M20 0l1.6 18L227.3 0"/></svg>') no-repeat left;
-        bottom: -$shadow-height;
-    }
 }
 
 .explainer__header {
