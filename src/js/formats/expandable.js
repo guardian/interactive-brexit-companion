@@ -3,17 +3,14 @@ import markdown from '../lib/markdown';
 import expandableTemplate from '../text/expandable.dot.html!text';
 
 export default {
-    preprocess({ content1: content, headline1: header, survey_like, survey_dislike }) {
+    preprocessFromExplainerApi(explainer) {
         const shortContentLength = 65;
-        const htmlContentArray = markdown.getHtmlContentArray(content);
+        const htmlContentArray = markdown.getHtmlContentArray(explainer.body);
         const shortContent = htmlContentArray.slice(0, shortContentLength).join(' ');
         const allContent = htmlContentArray.join(' ');
-
         return {
-            header,
+            header: explainer.title,
             shortContent,
-            survey_like,
-            survey_dislike,
             allContent,
         };
     },

@@ -2,14 +2,11 @@ import flatTemplate from '../text/flat.dot.html!text';
 import markdown from '../lib/markdown';
 
 export default {
-    preprocess({ headline1: header, content1, survey_like, survey_dislike }) {
-        const content = markdown.getHtmlContentString(content1);
-
+    preprocessFromExplainerApi(explainer) {
+        const content = markdown.getHtmlContentString(explainer.body);
         return {
-            header,
+            header: explainer.title,
             content,
-            survey_like,
-            survey_dislike,
         };
     },
     postRender() {

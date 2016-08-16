@@ -5,6 +5,9 @@ Usage
 
 Setup
 -----
+Check that you have global jspm credentials set up:
+`jspm registry config github`
+then:
 `npm install`
 
 Development

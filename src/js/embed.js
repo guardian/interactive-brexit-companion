@@ -1,7 +1,6 @@
 import './lib/shims';
 import iframeMessenger from 'guardian/iframe-messenger';
 import dot from 'olado/doT';
-import parallel from 'async.parallel';
 import formats from './formats/index';
 import feedback from './text/feedback.dot.partial.html!text';
 import render from './render';
@@ -18,22 +17,6 @@ function getQueryParams() {
     });
 
     return params;
-}
-
-function getRowById(rows, rowId) {
-    const row = rows.reduce((prev, currentRow) => {
-        if (currentRow.id.trim() === rowId) {
-            return currentRow;
-        }
-
-        return prev;
-    }, null);
-
-    if (!row) {
-        throw new Error(`row with id ${rowId} not found`);
-    }
-
-    return row;
 }
 
 function buildTemplateData(rowData, trackingCode) {
@@ -54,79 +37,54 @@ function buildTemplateData(rowData, trackingCode) {
     };
 }
 
-function getRows(response) {
-    const rows = response.sheets.content;
+function getExplainer(response) {
+    const explainer = response.response.explainer;
 
-    if (!rows || !rows.length) {
+    if (!explainer) {
         throw new Error(`bad JSON response: ${JSON.stringify(response)}`);
     }
 
-    return rows;
+    return explainer;
 }
 
-function getFormat(row) {
-    const format = formats[row.format];
+function getFormat(displayType) {
+    const format = formats[displayType];
 
     if (!format) {
-        throw new Error(`format ${row.format} is not valid`);
+        throw new Error(`format ${displayType} is not valid`);
     }
 
     return format;
 }
 
-function doRender(row, trackingCode, parentEl) {
-    const format = getFormat(row);
-    const { template, postRender, preprocess } = format;
+function doRender(explainer, trackingCode, parentEl) {
+    const format = getFormat(explainer.data.explainer.displayType);
+    const { template, postRender, preprocessFromExplainerApi } = format;
     const templateFn = dot.template(template, null, { feedback });
-    const rowData = preprocess(row);
-    const templateData = buildTemplateData(rowData, trackingCode);
 
-    render(templateFn, templateData, parentEl, row.id);
-    postRender(rowData);
+    const renderData = preprocessFromExplainerApi(explainer.data.explainer);
+    const templateData = buildTemplateData(renderData, trackingCode);
+
+    render(templateFn, templateData, parentEl, explainer.id);
+    postRender(templateData);
 }
 
 
 window.init = function init(parentEl) {
     const params = getQueryParams();
-    const isTailored = (params.tailored === 'true');
     const defaultLevel = params.default || 'intermediate';
-    const defaultAtomId = params[defaultLevel] || params.id;
+    const defaultAtomId = params.id;
 
     iframeMessenger.enableAutoResize();
 
-    function renderTailoredAtom(err, responses) {
+    function renderExplainMakerAtom(err, response) {
         if (err) {
             throw err;
         }
-        const spreadsheetRes = responses[0];
-        const tailorRes = responses[1];
-        const rows = getRows(spreadsheetRes);
-        const level = tailorRes.level || defaultLevel;
-        const id = params[level];
-        const row = getRowById(rows, id);
-        const trackingCode = `brexit__${level}__${id}__tailored`;
-
-        doRender(row, trackingCode, parentEl);
+        const explainer = getExplainer(response);
+        const trackingCode = `brexit__${defaultLevel}__${defaultAtomId}__untailored`;
+        doRender(explainer, trackingCode, parentEl);
     }
 
-    function renderUntailoredAtom(err, responses) {
-        if (err) {
-            throw err;
-        }
-        const spreadsheetRes = responses[0];
-        const rows = getRows(spreadsheetRes);
-        const id = defaultAtomId;
-        const row = getRowById(rows, id);
-        const trackingCode = `brexit__${row.level}__${id}__untailored`;
-
-        doRender(row, trackingCode, parentEl);
-    }
-
-    parallel(
-        [
-            requests.spreadsheetRequest,
-            isTailored ? requests.tailorRequest : callback => callback(null, {}),
-        ],
-        isTailored ? renderTailoredAtom : renderUntailoredAtom
-    );
+    requests.explainerApiRequest(defaultAtomId, renderExplainMakerAtom);
 };
