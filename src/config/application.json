@@ -2,5 +2,5 @@
     "tailorUrl": "https://members-data-api.theguardian.com/tailor/me?tag=politics/eu-referendum",
     "spreadsheetUrl": "//interactive.guim.co.uk/docsdata/1BtfoAr9B633r8mCJvrUtb838yRtyKuYHcYdUsmO2XGY.json",
     "maxCarouselSize": 6,
-    "explainerApiUrl": "//explainers-api.guim.co.uk.global.prod.fastly.net/atom/explainer/"
+    "explainerApiUrl": "//explainers-api.guim.co.uk/atom/explainer/"
 }
