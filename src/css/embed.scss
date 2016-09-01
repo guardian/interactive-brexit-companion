@@ -59,7 +59,6 @@ br {
 p, ol, ul {
     @include fs-textSans(3);
     margin: 0 0 $baseline/2 0;
-    font-weight: bold;
 }
 ul {
     padding-left: $gutter * 2;
