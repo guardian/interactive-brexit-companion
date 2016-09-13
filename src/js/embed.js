@@ -19,7 +19,7 @@ function getQueryParams() {
     return params;
 }
 
-function buildTemplateData(rowData, trackingCode) {
+function buildTemplateData(rowData, trackingCode, atomName) {
     return {
         data: rowData,
         trackingCode: {
@@ -33,6 +33,7 @@ function buildTemplateData(rowData, trackingCode) {
             back: `${trackingCode}__back`,
             catchMeUp: `${trackingCode}__catch_me_up`,
             signup: `${trackingCode}__signup`,
+            atomName: `${atomName}`
         },
     };
 }
@@ -57,23 +58,38 @@ function getFormat(displayType) {
     return format;
 }
 
-function doRender(explainer, trackingCode, parentEl) {
+function doRender(explainer, trackingCode, parentEl, atomName) {
     const format = getFormat(explainer.data.explainer.displayType);
     const { template, postRender, preprocessFromExplainerApi } = format;
     const templateFn = dot.template(template, null, { feedback });
 
     const renderData = preprocessFromExplainerApi(explainer.data.explainer);
-    const templateData = buildTemplateData(renderData, trackingCode);
+    const templateData = buildTemplateData(renderData, trackingCode, atomName);
 
     render(templateFn, templateData, parentEl, explainer.id);
     postRender(templateData);
 }
 
+function urlEncodeJson(json)  {
+    return Object.keys(json).map(function(k) {
+        return encodeURIComponent(k) + '=' + encodeURIComponent(json[k])
+    }).join('&')
+}
+
+
+window.ophanInteraction = function(atomName, interactionValue) {
+    var ophanUrl = '//ophan.theguardian.com/i.gif?viewId=' + window.guardian.ophan.pageViewId + '&' + urlEncodeJson({component: atomName, value: interactionValue})
+    var el = document.createElement("img");
+    el.src = ophanUrl;
+    el.style.display = "none";
+    document.body.appendChild(el);
+};
 
 window.init = function init(parentEl) {
     const params = getQueryParams();
     const defaultLevel = params.default || 'intermediate';
     const defaultAtomId = params.id;
+    const atomName = "explainer_feedback_" + defaultAtomId.substring(0,8);
 
     iframeMessenger.enableAutoResize();
 
@@ -83,7 +99,7 @@ window.init = function init(parentEl) {
         }
         const explainer = getExplainer(response);
         const trackingCode = `brexit__${defaultLevel}__${defaultAtomId}__untailored`;
-        doRender(explainer, trackingCode, parentEl);
+        doRender(explainer, trackingCode, parentEl, atomName);
     }
 
     requests.explainerApiRequest(defaultAtomId, renderExplainMakerAtom);
