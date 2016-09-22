@@ -23,15 +23,6 @@ function buildTemplateData(rowData, trackingCode, atomName) {
     return {
         data: rowData,
         trackingCode: {
-            like: `${trackingCode}__like`,
-            dislike: `${trackingCode}__dislike`,
-            more: `${trackingCode}__more`,
-            less: `${trackingCode}__less`,
-            prev: `${trackingCode}__prev`,
-            next: `${trackingCode}__next`,
-            goTo: `${trackingCode}__go_to`,
-            back: `${trackingCode}__back`,
-            catchMeUp: `${trackingCode}__catch_me_up`,
             signup: `${trackingCode}__signup`,
             atomName: `${atomName}`,
         },
@@ -88,7 +79,6 @@ window.ophanInteraction = function ophanInteraction(atomName, interactionValue) 
 
 window.init = function init(parentEl) {
     const params = getQueryParams();
-    const defaultLevel = params.default || 'intermediate';
     const defaultAtomId = params.id;
     const atomName = `explainer_feedback__${defaultAtomId}`;
 
@@ -99,7 +89,7 @@ window.init = function init(parentEl) {
             throw err;
         }
         const explainer = getExplainer(response);
-        const trackingCode = `brexit__${defaultLevel}__${defaultAtomId}__untailored`;
+        const trackingCode = `brexit__intermediate__${defaultAtomId}__untailored`;
         doRender(explainer, trackingCode, parentEl, atomName);
     }
 
