@@ -90,7 +90,7 @@ window.init = function init(parentEl) {
     const params = getQueryParams();
     const defaultLevel = params.default || 'intermediate';
     const defaultAtomId = params.id;
-    const atomName = `explainer_feedback__${defaultAtomId.substring(0, 8)}`;
+    const atomName = `explainer_feedback__${defaultAtomId}`;
 
     iframeMessenger.enableAutoResize();
 
