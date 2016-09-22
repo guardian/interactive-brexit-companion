@@ -33,7 +33,7 @@ function buildTemplateData(rowData, trackingCode, atomName) {
             back: `${trackingCode}__back`,
             catchMeUp: `${trackingCode}__catch_me_up`,
             signup: `${trackingCode}__signup`,
-            atomName: `${atomName}`
+            atomName: `${atomName}`,
         },
     };
 }
@@ -70,18 +70,19 @@ function doRender(explainer, trackingCode, parentEl, atomName) {
     postRender(templateData);
 }
 
-function urlEncodeJson(json)  {
-    return Object.keys(json).map(function(k) {
-        return encodeURIComponent(k) + '=' + encodeURIComponent(json[k])
-    }).join('&')
+function urlEncodeJson(json) {
+    return Object.keys(json).map((k) => `${encodeURIComponent(k)}=${encodeURIComponent(json[k])}`
+        ).join('&');
 }
 
-
-window.ophanInteraction = function(atomName, interactionValue) {
-    var ophanUrl = '//ophan.theguardian.com/i.gif?viewId=' + window.guardian.ophan.pageViewId + '&' + urlEncodeJson({component: atomName, value: interactionValue})
-    var el = document.createElement("img");
+window.ophanInteraction = function ophanInteraction(atomName, interactionValue) {
+    const queryParams = urlEncodeJson({ viewId: window.guardian.ophan.pageViewId,
+        component: atomName,
+        value: interactionValue });
+    const ophanUrl = `//ophan.theguardian.com/a.gif?${queryParams}`;
+    const el = document.createElement('img');
     el.src = ophanUrl;
-    el.style.display = "none";
+    el.style.display = 'none';
     document.body.appendChild(el);
 };
 
@@ -89,7 +90,7 @@ window.init = function init(parentEl) {
     const params = getQueryParams();
     const defaultLevel = params.default || 'intermediate';
     const defaultAtomId = params.id;
-    const atomName = "explainer_feedback_" + defaultAtomId.substring(0,8);
+    const atomName = `explainer_feedback__${defaultAtomId.substring(0, 8)}`;
 
     iframeMessenger.enableAutoResize();
 
