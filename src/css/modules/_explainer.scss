@@ -13,5 +13,5 @@
 .explainer__content {
     @include fs-textSans(3);
     margin: 0 0 $baseline/2 0;
-    font-weight: bold;
+    font-weight: 400;
 }
